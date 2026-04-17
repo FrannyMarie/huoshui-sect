@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Huǒ Shuǐ Sect">
+<meta name="theme-color" content="#FAEEDA">
+<title>Huǒ Shuǐ Sect — Dao of Fire &amp; Water</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --fire: #D85A30;
+    --fire-lt: #FAECE7;
+    --fire-md: #F0997B;
+    --water: #185FA5;
+    --water-lt: #E6F1FB;
+    --water-md: #85B7EB;
+    --gold: #BA7517;
+    --gold-lt: #FAEEDA;
+    --gold-md: #FAC775;
+    --purple: #534AB7;
+    --purple-lt: #EEEDFE;
+    --green: #3B6D11;
+    --green-lt: #EAF3DE;
+    --bg: #FFFFFF;
+    --bg2: #F5F5F3;
+    --bg3: #EEEDE8;
+    --text: #1A1A1A;
+    --text2: #666660;
+    --text3: #999993;
+    --border: rgba(0,0,0,0.12);
+    --border2: rgba(0,0,0,0.22);
+    --radius: 8px;
+    --radius-lg: 12px;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1C1C1E;
+      --bg2: #2C2C2E;
+      --bg3: #3A3A3C;
+      --text: #F2F2F7;
+      --text2: #AEAEB2;
+      --text3: #6C6C70;
+      --border: rgba(255,255,255,0.12);
+      --border2: rgba(255,255,255,0.22);
+      --fire-lt: #3D1A0E;
+      --water-lt: #0A1E35;
+      --gold-lt: #3A2505;
+      --purple-lt: #1A1635;
+      --green-lt: #0E2205;
+    }
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--bg3);
+    font-family: var(--font);
+    color: var(--text);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .app-shell {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 1rem 6rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    padding: 1.5rem 1rem 1rem;
+    border-bottom: 0.5px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+  .sect-name { font-size: 20px; font-weight: 600; letter-spacing: 0.5px; }
+  .sect-name .f { color: var(--fire); }
+  .sect-name .w { color: var(--water); }
+  .sect-sub { font-size: 11px; color: var(--text3); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+  .divider { display: flex; align-items: center; gap: 8px; margin: 6px 0 4px; }
+  .divider-line { flex: 1; height: 0.5px; background: var(--border); }
+  .realm-badge {
+    display: inline-block;
+    background: var(--gold-lt);
+    color: var(--gold);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 14px;
+    border-radius: 20px;
+    margin-top: 4px;
+  }
+
+  /* ── Qi Bar ── */
+  .qi-wrap { margin: 1rem 0 0.9rem; }
+  .qi-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 5px; }
+  .qi-label span:last-child { color: var(--gold); font-weight: 600; }
+  .qi-track { background: var(--bg2); border-radius: 20px; height: 10px; border: 0.5px solid var(--border); overflow: hidden; }
+  .qi-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--water-md), var(--fire-md)); transition: width 0.5s ease; }
+
+  /* ── Pillars ── */
+  .pillars { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 7px; margin-bottom: 1rem; }
+  .pc { border: 0.5px solid var(--border); border-radius: var(--radius); padding: 8px 4px; text-align: center; }
+  .pc.f { background: var(--fire-lt); border-color: var(--fire-md); }
+  .pc.w { background: var(--water-lt); border-color: var(--water-md); }
+  .pc.g { background: var(--gold-lt); border-color: var(--gold-md); }
+  .pc.n { background: var(--bg2); }
+  .pi { font-size: 16px; margin-bottom: 3px; }
+  .pn { font-size: 10px; color: var(--text2); margin-bottom: 2px; }
+  .pv { font-size: 15px; font-weight: 600; color: var(--text); }
+
+  /* ── Streak Bar ── */
+  .streak-bar {
+    display: flex; gap: 5px; justify-content: center; align-items: center;
+    margin-bottom: 1rem; background: var(--bg2);
+    border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px;
+  }
+  .sd { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .dot {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 1.5px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; transition: all 0.2s;
+    color: var(--text3);
+  }
+  .dot.done { background: linear-gradient(135deg, var(--fire), var(--water)); border-color: transparent; color: white; }
+  .dot.rest { background: var(--purple-lt); border-color: var(--purple); color: var(--purple); }
+  .dot.today { border-color: var(--gold); border-style: dashed; }
+  .slbl { font-size: 10px; color: var(--text3); }
+  .scnt { font-size: 12px; font-weight: 600; color: var(--gold); margin-left: 6px; white-space: nowrap; }
+
+  /* ── Bottom Nav ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: var(--bg);
+    border-top: 0.5px solid var(--border);
+    display: flex;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 10;
+  }
+  .nav-btn {
+    flex: 1; padding: 10px 4px 8px;
+    font-size: 10px; font-weight: 500;
+    color: var(--text3);
+    background: none; border: none; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    transition: color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-btn .nav-icon { font-size: 20px; }
+  .nav-btn.active { color: var(--fire); }
+
+  /* ── Section label ── */
+  .sec-lbl { font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .grp-pill { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 7px; margin-top: 6px; }
+  .gf { background: var(--fire-lt); color: var(--fire); }
+  .gw { background: var(--water-lt); color: var(--water); }
+  .ge { background: var(--gold-lt); color: var(--gold); }
+
+  /* ── Practices ── */
+  .prac {
+    display: flex; align-items: center; gap: 11px;
+    background: var(--bg); border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 12px 13px;
+    cursor: pointer; transition: border-color 0.2s;
+    user-select: none; margin-bottom: 7px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .prac:active { opacity: 0.8; }
+  .prac.df { border-color: var(--fire); background: var(--fire-lt); }
+  .prac.dw { border-color: var(--water); background: var(--water-lt); }
+  .prac.de { border-color: var(--gold); background: var(--gold-lt); }
+  .pchk {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 1.5px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 11px; color: transparent; transition: all 0.2s;
+  }
+  .prac.df .pchk { background: var(--fire); border-color: var(--fire); color: white; }
+  .prac.dw .pchk { background: var(--water); border-color: var(--water); color: white; }
+  .prac.de .pchk { background: var(--gold); border-color: var(--gold); color: white; }
+  .pinfo { flex: 1; }
+  .ptitle { font-size: 13px; font-weight: 600; color: var(--text); }
+  .prac.df .ptitle { color: var(--fire); }
+  .prac.dw .ptitle { color: var(--water); }
+  .prac.de .ptitle { color: var(--gold); }
+  .psub { font-size: 11px; color: var(--text2); margin-top: 2px; line-height: 1.4; }
+  .pqi { font-size: 12px; color: var(--gold); font-weight: 600; white-space: nowrap; }
+
+  /* ── Rest Panel ── */
+  .rest-panel {
+    background: var(--purple-lt); border: 0.5px solid var(--purple);
+    border-radius: var(--radius); padding: 1rem; text-align: center; margin-bottom: 1rem;
+  }
+  .rest-panel h3 { font-size: 14px; font-weight: 600; color: var(--purple); margin-bottom: 4px; }
+  .rest-panel p { font-size: 12px; color: var(--text2); margin-bottom: 10px; line-height: 1.5; }
+  .rbtn {
+    background: var(--purple); color: white; border: none;
+    border-radius: var(--radius); padding: 8px 18px; font-size: 13px;
+    cursor: pointer; font-weight: 500;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .rbtn.taken { background: var(--bg2); color: var(--text2); border: 0.5px solid var(--border); cursor: default; }
+
+  /* ── Sync Cards ── */
+  .sync-note {
+    font-size: 12px; color: var(--text2); line-height: 1.6;
+    margin-bottom: 1rem; padding: 10px 12px;
+    background: var(--bg2); border-radius: var(--radius);
+  }
+  .sync-card {
+    background: var(--bg); border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1rem 1.1rem; margin-bottom: 10px;
+  }
+  .sync-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 6px; }
+  .sync-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .sync-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+  .bm { background: var(--gold-lt); color: var(--gold); }
+  .ba { background: var(--green-lt); color: var(--green); }
+  .sync-row { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+  .sync-lbl { font-size: 12px; color: var(--text2); flex: 1; }
+  .sync-unit { font-size: 11px; color: var(--text3); white-space: nowrap; }
+  .sync-input {
+    width: 80px; padding: 6px 8px; font-size: 13px;
+    background: var(--bg2); border: 0.5px solid var(--border);
+    border-radius: var(--radius); color: var(--text); text-align: right;
+    -webkit-appearance: none;
+  }
+  .sync-input:focus { outline: none; border-color: var(--fire); }
+  .sync-qi { font-size: 11px; font-weight: 600; white-space: nowrap; min-width: 44px; text-align: right; color: var(--text3); }
+  .sync-qi.has-qi { color: var(--gold); }
+  .apply-btn {
+    width: 100%; margin-top: 8px; padding: 8px;
+    font-size: 13px; font-weight: 600;
+    background: var(--gold-lt); color: var(--gold);
+    border: 0.5px solid var(--gold); border-radius: var(--radius);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .apply-btn:active { opacity: 0.8; }
+  .applied-tag { font-size: 11px; color: var(--green); font-weight: 600; margin-left: 6px; }
+
+  /* ── Journal ── */
+  .jmeta { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+  textarea {
+    width: 100%; background: var(--bg2);
+    border: 0.5px solid var(--border); border-radius: var(--radius);
+    padding: 10px 12px; font-size: 14px; color: var(--text);
+    font-family: var(--font); resize: none; min-height: 100px;
+    transition: border-color 0.2s; line-height: 1.6;
+    -webkit-appearance: none;
+  }
+  textarea:focus { outline: none; border-color: var(--fire); }
+  textarea::placeholder { color: var(--text3); }
+  .fbtn {
+    margin-top: 8px; background: var(--fire-lt); color: var(--fire);
+    border: 0.5px solid var(--fire); border-radius: var(--radius);
+    padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .saved-entry {
+    background: var(--bg2); border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 10px 12px; margin-bottom: 8px;
+  }
+  .se-date { font-size: 11px; color: var(--fire); margin-bottom: 4px; font-weight: 600; }
+  .se-text { font-size: 13px; color: var(--text); line-height: 1.6; }
+
+  /* ── Chronicle ── */
+  .log-entry { font-size: 12px; color: var(--text2); padding: 6px 0; border-bottom: 0.5px solid var(--border); line-height: 1.5; }
+  .log-entry:last-child { border-bottom: none; }
+  .log-time { color: var(--fire); margin-right: 6px; font-weight: 600; }
+
+  /* ── The Dao (science) ── */
+  .dao-intro { font-size: 12px; color: var(--text2); line-height: 1.7; margin-bottom: 1rem; padding: 10px 12px; background: var(--bg2); border-radius: var(--radius); }
+  .sci-row { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--border); }
+  .sci-row:last-child { border-bottom: none; }
+  .sci-icon { font-size: 16px; flex-shrink: 0; width: 22px; }
+  .sci-body { flex: 1; }
+  .sci-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+  .sci-note { font-size: 11px; color: var(--text2); line-height: 1.5; }
+  .sci-layers { font-size: 12px; font-weight: 600; color: var(--fire); white-space: nowrap; }
+
+  /* ── Reset ── */
+  .reset-btn {
+    display: block; margin: 1.5rem auto 0; font-size: 11px; color: var(--text3);
+    background: none; border: 0.5px solid var(--border);
+    border-radius: var(--radius); padding: 6px 16px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .reset-btn:active { color: var(--text); }
+
+  /* ── Breakthrough overlay ── */
+  .bt-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 50;
+  }
+  .bt-overlay.show { display: flex; }
+  .bt-card {
+    background: var(--bg); border: 1px solid var(--fire);
+    border-radius: var(--radius-lg); padding: 2rem 1.5rem; text-align: center; max-width: 300px; width: 90%;
+  }
+  .bt-big { font-size: 36px; margin-bottom: 10px; }
+  .bt-card h2 { font-size: 20px; font-weight: 700; color: var(--fire); margin-bottom: 8px; }
+  .bt-card p { font-size: 14px; color: var(--text2); margin-bottom: 1.25rem; line-height: 1.5; }
+  .bt-close {
+    background: var(--fire-lt); color: var(--fire);
+    border: 0.5px solid var(--fire); border-radius: var(--radius);
+    padding: 8px 22px; cursor: pointer; font-size: 14px; font-weight: 600;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <div class="header">
+    <div class="sect-name"><span class="f">火</span> <span class="f">Huǒ Shuǐ</span> <span class="w">水</span> Sect</div>
+    <div class="sect-sub">Dao of Fire &amp; Water</div>
+    <div class="divider"><div class="divider-line"></div><span style="font-size:15px;">☯</span><div class="divider-line"></div></div>
+    <div style="font-size:12px;color:var(--text2);">Cultivator's path</div>
+    <div class="realm-badge" id="realm-badge">Qi Gathering — Layer 1</div>
+  </div>
+
+  <div class="scroll-area">
+
+    <div class="qi-wrap">
+      <div class="qi-label"><span>Qi refinement</span><span id="qi-text">0 / 100 Qi</span></div>
+      <div class="qi-track"><div class="qi-fill" id="qi-fill" style="width:0%"></div></div>
+    </div>
+
+    <div class="pillars">
+      <div class="pc f"><div class="pi">🔥</div><div class="pn">Inner Fire</div><div class="pv" id="pv-fire">0</div></div>
+      <div class="pc w"><div class="pi">💧</div><div class="pn">Still Water</div><div class="pv" id="pv-water">0</div></div>
+      <div class="pc g"><div class="pi">🏮</div><div class="pn">Sect Order</div><div class="pv" id="pv-sect">0</div></div>
+      <div class="pc n"><div class="pi">💰</div><div class="pn">Spirit Stones</div><div class="pv" id="pv-stones">0</div></div>
+    </div>
+
+    <div class="streak-bar" id="streak-bar"></div>
+
+    <!-- TAB: Cultivation -->
+    <div id="tab-practices">
+      <div class="rest-panel" id="rest-panel" style="display:none">
+        <h3>🍶 Day of Wandering Among Mortals</h3>
+        <p>Fire and Water must balance. One day per week, the cultivator walks the mortal realm. Rest is not weakness — it is the still water that sharpens the blade.</p>
+        <button class="rbtn" id="rest-btn" onclick="takeRest()">Declare day of wandering</button>
+      </div>
+      <div class="grp-pill gf">🔥 Fire Path — inner cultivation</div>
+      <div id="grp-fire"></div>
+      <div class="grp-pill gw">💧 Water Path — body &amp; world</div>
+      <div id="grp-water"></div>
+      <div class="grp-pill ge">🏮 Earth Path — order &amp; provision</div>
+      <div id="grp-earth"></div>
+      <button class="reset-btn" onclick="resetDay()">New dawn — reset today's cultivation</button>
+    </div>
+
+    <!-- TAB: Sync -->
+    <div id="tab-sync" class="hidden">
+      <div class="sync-note">Enter today's data from your apps. Each field awards Qi based on what you actually did. When we connect your apps in a future update, these fields will fill in automatically.</div>
+
+      <div class="sync-card">
+        <div class="sync-header">
+          <div class="sync-title">⌚ Fitbit / fitness tracker</div>
+          <div class="sync-badge bm">Manual now · Auto later</div>
+        </div>
+        <div class="sync-row"><span class="sync-lbl">Steps today</span><input class="sync-input" type="number" id="s-steps" placeholder="0" min="0"><span class="sync-unit">steps</span><span class="sync-qi" id="q-steps">+0 Qi</span></div>
+        <div class="sync-row"><span class="sync-lbl">Active minutes</span><input class="sync-input" type="number" id="s-active" placeholder="0" min="0"><span class="sync-unit">min</span><span class="sync-qi" id="q-active">+0 Qi</span></div>
+        <div class="sync-row"><span class="sync-lbl">Sleep last night</span><input class="sync-input" type="number" id="s-sleep" placeholder="0" min="0" max="24" step="0.5"><span class="sync-unit">hrs</span><span class="sync-qi" id="q-sleep">+0 Qi</span></div>
+        <div class="sync-row"><span class="sync-lbl">Resting heart rate</span><input class="sync-input" type="number" id="s-hr" placeholder="0" min="0"><span class="sync-unit">bpm</span><span class="sync-qi" id="q-hr">+0 Qi</span></div>
+        <button class="apply-btn" onclick="applySync('fitbit')">Apply Fitbit data ✦ <span id="fitbit-applied" class="applied-tag hidden">Applied!</span></button>
+      </div>
+
+      <div class="sync-card">
+        <div class="sync-header">
+          <div class="sync-title">🧘 Insight Timer / meditation</div>
+          <div class="sync-badge bm">Manual now · Auto later</div>
+        </div>
+        <div class="sync-row"><span class="sync-lbl">Meditation today</span><input class="sync-input" type="number" id="s-med" placeholder="0" min="0"><span class="sync-unit">min</span><span class="sync-qi" id="q-med">+0 Qi</span></div>
+        <div class="sync-row"><span class="sync-lbl">Sessions completed</span><input class="sync-input" type="number" id="s-sessions" placeholder="0" min="0"><span class="sync-unit">sessions</span><span class="sync-qi" id="q-sessions">+0 Qi</span></div>
+        <button class="apply-btn" onclick="applySync('timer')">Apply meditation data ✦ <span id="timer-applied" class="applied-tag hidden">Applied!</span></button>
+      </div>
+
+      <div class="sync-card">
+        <div class="sync-header">
+          <div class="sync-title">🦜 Duolingo</div>
+          <div class="sync-badge bm">Manual now · Auto later</div>
+        </div>
+        <div class="sync-row"><span class="sync-lbl">XP earned today</span><input class="sync-input" type="number" id="s-xp" placeholder="0" min="0"><span class="sync-unit">XP</span><span class="sync-qi" id="q-xp">+0 Qi</span></div>
+        <div class="sync-row"><span class="sync-lbl">Streak days</span><input class="sync-input" type="number" id="s-streak" placeholder="0" min="0"><span class="sync-unit">days</span><span class="sync-qi" id="q-streak-duo">+0 Qi</span></div>
+        <button class="apply-btn" onclick="applySync('duo')">Apply Duolingo data ✦ <span id="duo-applied" class="applied-tag hidden">Applied!</span></button>
+      </div>
+
+      <div class="sync-card">
+        <div class="sync-header">
+          <div class="sync-title">🏮 Flylady / household</div>
+          <div class="sync-badge ba">Manual always</div>
+        </div>
+        <div class="sync-row"><span class="sync-lbl">Zones completed</span><input class="sync-input" type="number" id="s-zones" placeholder="0" min="0" max="5"><span class="sync-unit">/ 5</span><span class="sync-qi" id="q-zones">+0 Qi</span></div>
+        <div class="sync-row"><span class="sync-lbl">Routines done</span><input class="sync-input" type="number" id="s-routines" placeholder="0" min="0"><span class="sync-unit">routines</span><span class="sync-qi" id="q-routines">+0 Qi</span></div>
+        <button class="apply-btn" onclick="applySync('fly')">Apply housework data ✦ <span id="fly-applied" class="applied-tag hidden">Applied!</span></button>
+      </div>
+    </div>
+
+    <!-- TAB: Journal -->
+    <div id="tab-journal" class="hidden">
+      <div class="jmeta" id="jmeta">Jade scroll</div>
+      <textarea id="jinput" placeholder="What did the Dao reveal today? What trials arose? What did Fire consume, and what did Water carry away?..." rows="5"></textarea>
+      <button class="fbtn" onclick="saveEntry()">Seal the entry ✦</button>
+      <div class="sec-lbl" style="margin-top:1.25rem;">Past inscriptions</div>
+      <div id="saved-entries"></div>
+    </div>
+
+    <!-- TAB: The Dao -->
+    <div id="tab-dao" class="hidden">
+      <div class="dao-intro">The science behind your realm progression. Each layer ≈ one focused week of consistent practice. Consistency matters far more than intensity.</div>
+      <div id="dao-rows"></div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.7;margin-top:1rem;padding:8px 10px;background:var(--bg2);border-radius:var(--radius);">
+        Source: University College London (2010) found habits take 18–254 days on average. A 2024 meta-analysis (University of South Australia) found most health habits require 2–5 months to become automatic.
+      </div>
+    </div>
+
+    <!-- TAB: Chronicle -->
+    <div id="tab-chronicle" class="hidden">
+      <div class="sec-lbl">Sect chronicle</div>
+      <div id="log-area"></div>
+    </div>
+
+  </div><!-- end scroll-area -->
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="sw('practices')" id="nav-practices"><span class="nav-icon">☯</span>Cultivation</button>
+    <button class="nav-btn" onclick="sw('sync')" id="nav-sync"><span class="nav-icon">⚡</span>Sync</button>
+    <button class="nav-btn" onclick="sw('journal')" id="nav-journal"><span class="nav-icon">📜</span>Journal</button>
+    <button class="nav-btn" onclick="sw('dao')" id="nav-dao"><span class="nav-icon">🔥</span>The Dao</button>
+    <button class="nav-btn" onclick="sw('chronicle')" id="nav-chronicle"><span class="nav-icon">📖</span>Chronicle</button>
+  </nav>
+</div>
+
+<div class="bt-overlay" id="bt-overlay">
+  <div class="bt-card">
+    <div class="bt-big" id="bt-icon">⚡</div>
+    <h2 id="bt-title">Breakthrough!</h2>
+    <p id="bt-msg">The Dao opens before you.</p>
+    <button class="bt-close" onclick="closeBT()">Continue the path</button>
+  </div>
+</div>
+
+<script>
+const PRACTICES = [
+  {id:'meditation', title:'Inner Flame (Meditation)',    sub:'Still the mind, gather spiritual fire — 10–20 min', qi:20, group:'fire', dc:'df', icon:'🧘'},
+  {id:'reading',    title:'Jade Scroll (Learning)',      sub:'Feed the inner flame of wisdom — read, study, learn', qi:10, group:'fire', dc:'df', icon:'📜'},
+  {id:'sleep',      title:'Still Pool (Sleep)',          sub:'Let water restore what fire consumed — 7–9 hours', qi:15, group:'water', dc:'dw', icon:'🌙'},
+  {id:'exercise',   title:'Sword Practice (Movement)',   sub:'Forge the body — 30+ minutes of deliberate motion', qi:20, group:'water', dc:'dw', icon:'⚔️'},
+  {id:'food',       title:'Spirit Fruit (Whole Foods)',  sub:'Nourish the vessel — clean, unprocessed food today', qi:15, group:'water', dc:'dw', icon:'🍎'},
+  {id:'water',      title:'Clear Meridians (Hydration)', sub:'Drink living water — clear the channels of the body', qi:10, group:'water', dc:'dw', icon:'💧'},
+  {id:'sect',       title:'Sect Hall Upkeep (Housework)',sub:'Tend the sacred dwelling — order cultivates the spirit', qi:10, group:'earth', dc:'de', icon:'🏮'},
+  {id:'money',      title:'Spirit Stones (Finance)',     sub:'Earn, save, or invest — secure the material foundation', qi:10, group:'earth', dc:'de', icon:'💰'},
+];
+
+const DAO_SCIENCE = [
+  {icon:'🧘', name:'Cultivation (Meditation)',   note:'Brain changes begin in 4–8 weeks. Automaticity at ~66 days.', layers:'~9 layers'},
+  {icon:'⚔️', name:'Sword Practice (Exercise)',  note:'AHA: 150 min/week. Complex movement habits: 2–5 months.', layers:'~12 layers'},
+  {icon:'🍎', name:'Spirit Fruit (Whole Foods)', note:'Dietary habits among the hardest. Expect 3–5 months.', layers:'~12 layers'},
+  {icon:'🌙', name:'Still Pool (Sleep)',          note:'7–9 hrs/night. Consistent timing matters most. ~2 months.', layers:'~9 layers'},
+  {icon:'💧', name:'Clear Meridians (Hydration)','note':'Simplest habit. Research shows ~18–21 days to automate.', layers:'~3 layers'},
+  {icon:'📜', name:'Jade Scroll (Learning)',      note:'Reading habit: 21–30 days. Language fluency: 500+ hours.', layers:'~6 layers'},
+  {icon:'🏮', name:'Sect Hall Upkeep',            note:'Order reduces cortisol. Household routines: ~30–45 days.', layers:'~6 layers'},
+  {icon:'💰', name:'Spirit Stones (Finance)',     note:'Financial habits: ~2–3 months to feel natural.', layers:'~9 layers'},
+];
+
+const REALMS = [
+  {name:'Qi Gathering',            layers:9, qiPerLayer:100},
+  {name:'Foundation Establishment',layers:4, qiPerLayer:300},
+  {name:'Golden Core',             layers:3, qiPerLayer:700},
+  {name:'Nascent Soul',            layers:3, qiPerLayer:1500},
+  {name:'Spirit Transformation',   layers:2, qiPerLayer:3000},
+  {name:'Immortal Ascension',      layers:1, qiPerLayer:9999},
+];
+
+const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function todayStr() { return new Date().toDateString(); }
+function weekKey() {
+  const d = new Date(); d.setHours(0,0,0,0);
+  const m = new Date(d); m.setDate(d.getDate() - d.getDay());
+  return m.toDateString();
+}
+
+function def() {
+  return {totalQi:0, fire:0, water:0, sect:0, stones:0, done:{}, syncApplied:{}, restTaken:false, log:[], journal:[], lastDay:todayStr(), weekKey:weekKey(), weekDays:{}};
+}
+
+function loadState() {
+  try {
+    const r = localStorage.getItem('hsx_v5');
+    if (!r) return def();
+    let s = {...def(), ...JSON.parse(r)};
+    if (s.lastDay !== todayStr()) { s.done = {}; s.syncApplied = {}; s.restTaken = false; s.lastDay = todayStr(); }
+    if (s.weekKey !== weekKey()) { s.weekKey = weekKey(); s.weekDays = {}; }
+    return s;
+  } catch(e) { return def(); }
+}
+
+function saveState() {
+  try { localStorage.setItem('hsx_v5', JSON.stringify(state)); } catch(e) {}
+}
+
+let state = loadState();
+let activeTab = 'practices';
+
+function getRealm(q) {
+  for (let r = 0; r < REALMS.length; r++) {
+    const rl = REALMS[r], total = rl.layers * rl.qiPerLayer;
+    if (q < total || r === REALMS.length - 1) {
+      return {
+        name: rl.name,
+        layer: Math.min(Math.floor(q / rl.qiPerLayer) + 1, rl.layers),
+        layerQi: q % rl.qiPerLayer,
+        qiPerLayer: rl.qiPerLayer,
+        realmIdx: r
+      };
+    }
+    q -= total;
+  }
+}
+
+function addLog(msg) {
+  const t = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+  state.log.unshift({t, msg});
+  if (state.log.length > 50) state.log.pop();
+}
+
+const TABS = ['practices','sync','journal','dao','chronicle'];
+
+function sw(tab) {
+  activeTab = tab;
+  TABS.forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab);
+    document.getElementById('nav-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'journal') renderJournal();
+  if (tab === 'chronicle') renderLog();
+  if (tab === 'sync') renderSyncPreviews();
+  if (tab === 'dao') renderDao();
+}
+
+function renderStreak() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dow = today.getDay();
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today); d.setDate(today.getDate() - dow + i);
+    const key = d.toDateString(), isToday = key === todayStr(), st = state.weekDays[key];
+    let dc = 'dot', lbl = '';
+    if (st === 'done') { dc += ' done'; lbl = '✓'; }
+    else if (st === 'rest') { dc += ' rest'; lbl = '〜'; }
+    else if (isToday) dc += ' today';
+    html += `<div class="sd"><div class="${dc}">${lbl}</div><div class="slbl">${DAYS[d.getDay()]}</div></div>`;
+  }
+  const done = Object.values(state.weekDays).filter(v => v === 'done').length;
+  html += `<div class="scnt">${done}/6</div>`;
+  document.getElementById('streak-bar').innerHTML = html;
+}
+
+function renderPractices() {
+  const restTaken = state.restTaken || state.weekDays[todayStr()] === 'rest';
+  const restUsed = Object.values(state.weekDays).some(v => v === 'rest') && !restTaken;
+  const rp = document.getElementById('rest-panel'), rb = document.getElementById('rest-btn');
+  rp.style.display = restUsed ? 'none' : 'block';
+  if (restTaken) { rb.textContent = 'Wandering declared — rest well, cultivator'; rb.className = 'rbtn taken'; }
+  else { rb.textContent = 'Declare day of wandering'; rb.className = 'rbtn'; }
+
+  ['fire','water','earth'].forEach(g => {
+    const el = document.getElementById('grp-' + g);
+    el.innerHTML = '';
+    PRACTICES.filter(p => p.group === g).forEach(p => {
+      const done = !!state.done[p.id];
+      const div = document.createElement('div');
+      div.className = 'prac' + (done ? ' ' + p.dc : '');
+      div.innerHTML = `<div class="pchk">${done ? '✓' : ''}</div><div class="pinfo"><div class="ptitle">${p.icon} ${p.title}</div><div class="psub">${p.sub}</div></div><div class="pqi">+${p.qi} Qi</div>`;
+      if (!done && !restTaken) div.onclick = () => complete(p);
+      el.appendChild(div);
+    });
+  });
+}
+
+function renderJournal() {
+  document.getElementById('jmeta').textContent = 'Jade scroll — ' + new Date().toLocaleDateString([], {weekday:'long', month:'long', day:'numeric'});
+  const el = document.getElementById('saved-entries');
+  if (!state.journal || !state.journal.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text2);font-style:italic;">No inscriptions yet. Begin writing, cultivator.</div>';
+    return;
+  }
+  el.innerHTML = [...state.journal].reverse().map(e =>
+    `<div class="saved-entry"><div class="se-date">${e.date}</div><div class="se-text">${e.text}</div></div>`
+  ).join('');
+}
+
+function renderLog() {
+  const el = document.getElementById('log-area');
+  if (!state.log || !state.log.length) {
+    el.innerHTML = '<div class="log-entry" style="font-style:italic;">The chronicle awaits your first act.</div>';
+    return;
+  }
+  el.innerHTML = state.log.map(l =>
+    `<div class="log-entry"><span class="log-time">${l.t}</span>${l.msg}</div>`
+  ).join('');
+}
+
+function renderDao() {
+  const el = document.getElementById('dao-rows');
+  if (el.children.length) return;
+  el.innerHTML = DAO_SCIENCE.map(d =>
+    `<div class="sci-row"><div class="sci-icon">${d.icon}</div><div class="sci-body"><div class="sci-name">${d.name}</div><div class="sci-note">${d.note}</div></div><div class="sci-layers">${d.layers}</div></div>`
+  ).join('');
+}
+
+function calcQi(field, val) {
+  if (!val || isNaN(val) || val <= 0) return 0;
+  val = parseFloat(val);
+  const map = {
+    steps:    val >= 10000 ? 15 : val >= 7000 ? 10 : val >= 4000 ? 5 : 0,
+    active:   val >= 60 ? 15 : val >= 30 ? 10 : val >= 15 ? 5 : 0,
+    sleep:    val >= 7 && val <= 9 ? 15 : val >= 6 ? 8 : val >= 5 ? 4 : 0,
+    hr:       val > 0 && val < 60 ? 10 : val >= 60 && val <= 70 ? 8 : val > 70 && val <= 80 ? 4 : 0,
+    med:      val >= 30 ? 20 : val >= 15 ? 14 : val >= 5 ? 8 : 0,
+    sessions: val >= 2 ? 8 : val >= 1 ? 5 : 0,
+    xp:       val >= 100 ? 10 : val >= 50 ? 7 : val >= 10 ? 4 : 0,
+    streak:   val >= 30 ? 8 : val >= 7 ? 5 : val >= 1 ? 2 : 0,
+    zones:    Math.min(val, 5) * 4,
+    routines: Math.min(val * 3, 12),
+  };
+  return map[field] || 0;
+}
+
+function renderSyncPreviews() {
+  const fields = ['steps','active','sleep','hr','med','sessions','xp','streak','zones','routines'];
+  fields.forEach(f => {
+    const inp = document.getElementById('s-' + f);
+    const prev = document.getElementById('q-' + (f === 'streak' ? 'streak-duo' : f));
+    if (!inp || !prev) return;
+    const qi = calcQi(f, inp.value);
+    prev.textContent = '+' + qi + ' Qi';
+    prev.classList.toggle('has-qi', qi > 0);
+  });
+}
+
+document.querySelectorAll('.sync-input').forEach(inp => {
+  inp.addEventListener('input', renderSyncPreviews);
+});
+
+function applySync(source) {
+  if (state.syncApplied[source]) {
+    alert('Already applied ' + source + ' data today. Come back tomorrow, cultivator.');
+    return;
+  }
+  const fieldMap = {
+    fitbit: ['steps','active','sleep','hr'],
+    timer:  ['med','sessions'],
+    duo:    ['xp','streak'],
+    fly:    ['zones','routines'],
+  };
+  let totalQi = 0;
+  (fieldMap[source] || []).forEach(f => {
+    const inp = document.getElementById('s-' + f);
+    if (inp) totalQi += calcQi(f, inp.value);
+  });
+  if (totalQi === 0) {
+    alert('No Qi earned yet. Check your numbers — some thresholds apply (e.g. 5+ min meditation, 4000+ steps).');
+    return;
+  }
+  const prev = getRealm(state.totalQi);
+  state.totalQi += totalQi;
+  state.syncApplied[source] = true;
+  const names = {fitbit:'Fitbit', timer:'Insight Timer', duo:'Duolingo', fly:'Flylady'};
+  addLog('⚡ ' + names[source] + ' sync — +' + totalQi + ' Qi absorbed from the mortal world.');
+  const now = getRealm(state.totalQi);
+  saveState(); render();
+  const tag = document.getElementById(source + '-applied');
+  if (tag) { tag.classList.remove('hidden'); setTimeout(() => tag.classList.add('hidden'), 2500); }
+  if (now.layer > prev.layer || now.realmIdx > prev.realmIdx) showBT(now, prev);
+}
+
+function complete(p) {
+  const prev = getRealm(state.totalQi);
+  state.done[p.id] = true;
+  state.totalQi += p.qi;
+  if (p.group === 'fire') state.fire += p.qi;
+  else if (p.group === 'water') state.water += p.qi;
+  else if (p.group === 'earth') state.sect += p.qi;
+  if (p.id === 'money') state.stones += p.qi;
+  if (PRACTICES.every(pr => state.done[pr.id])) state.weekDays[todayStr()] = 'done';
+  addLog(p.icon + ' ' + p.title + ' — +' + p.qi + ' Qi refined.');
+  const now = getRealm(state.totalQi);
+  saveState(); render();
+  if (now.layer > prev.layer || now.realmIdx > prev.realmIdx) showBT(now, prev);
+}
+
+function showBT(now, prev) {
+  const crossed = now.realmIdx > prev.realmIdx;
+  document.getElementById('bt-icon').textContent = crossed ? '🌟' : '⚡';
+  document.getElementById('bt-title').textContent = crossed ? 'Realm Ascension!' : 'Layer Breakthrough!';
+  document.getElementById('bt-msg').textContent = crossed
+    ? 'The heavens tremble. You have entered the ' + now.name + ' realm.'
+    : 'Layer ' + now.layer + ' of ' + now.name + ' achieved. Fire and Water align.';
+  document.getElementById('bt-overlay').classList.add('show');
+}
+function closeBT() { document.getElementById('bt-overlay').classList.remove('show'); }
+
+function takeRest() {
+  if (Object.values(state.weekDays).some(v => v === 'rest')) return;
+  state.restTaken = true; state.weekDays[todayStr()] = 'rest';
+  addLog('🍶 Day of Wandering declared. The cultivator walks among mortals.');
+  saveState(); render();
+}
+
+function saveEntry() {
+  const txt = document.getElementById('jinput').value.trim();
+  if (!txt) return;
+  if (!state.journal) state.journal = [];
+  const date = new Date().toLocaleDateString([], {weekday:'short', month:'short', day:'numeric', year:'numeric'});
+  state.journal.push({date, text: txt.replace(/</g,'&lt;').replace(/>/g,'&gt;')});
+  document.getElementById('jinput').value = '';
+  addLog('📜 Reflection inscribed in the jade scroll.');
+  saveState(); renderJournal();
+}
+
+function resetDay() {
+  if (confirm('Begin a new dawn? Today\'s practices and sync reset. Your total Qi and journal are preserved.')) {
+    state.done = {}; state.syncApplied = {}; state.restTaken = false; state.log = []; state.lastDay = todayStr();
+    saveState(); render();
+  }
+}
+
+function render() {
+  const info = getRealm(state.totalQi);
+  document.getElementById('realm-badge').textContent = info.name + ' — Layer ' + info.layer;
+  document.getElementById('qi-text').textContent = info.layerQi + ' / ' + info.qiPerLayer + ' Qi';
+  document.getElementById('qi-fill').style.width = Math.min(100, Math.round((info.layerQi / info.qiPerLayer) * 100)) + '%';
+  document.getElementById('pv-fire').textContent = state.fire;
+  document.getElementById('pv-water').textContent = state.water;
+  document.getElementById('pv-sect').textContent = state.sect;
+  document.getElementById('pv-stones').textContent = state.stones;
+  renderStreak();
+  if (activeTab === 'practices') renderPractices();
+  if (activeTab === 'journal') renderJournal();
+  if (activeTab === 'chronicle') renderLog();
+  if (activeTab === 'sync') renderSyncPreviews();
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+render();
+</script>
+</body>
+</html>
